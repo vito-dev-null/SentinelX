@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=SentinelX Node 3
+Comment=SentinelX Node 3 embedded SOC desktop
+Exec=/opt/sentinelx/scripts/launch-node3-desktop.sh
+Path=/opt/sentinelx
+Icon=/opt/sentinelx/assets/sentinelx-icon.svg
+Terminal=false
+StartupNotify=true
+StartupWMClass=sentinelx-soc
+Categories=Network;Security;

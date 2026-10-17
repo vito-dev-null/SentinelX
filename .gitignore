@@ -1,0 +1,13 @@
+target/
+*.db
+*.db-shm
+*.db-wal
+logs/*.log
+.idea/
+*.iml
+config/server.properties.local
+config/server.properties
+data/
+.sentinellogs/
+logs/
+.env

@@ -1,0 +1,6 @@
+package com.enterprise.siem.security;
+import com.enterprise.siem.model.*; import java.io.*; import java.nio.charset.StandardCharsets; import java.nio.file.*; import java.time.Instant;
+public final class FileSecurityAuditLogger implements SecurityAuditLogger { private static final long MAX_BYTES=20L*1024*1024; private final Path file; public FileSecurityAuditLogger(String path) throws IOException { file=Path.of(path); if(file.getParent()!=null) Files.createDirectories(file.getParent()); }
+ public synchronized boolean log(Incident i, Alert a, String action, String result) { String line=String.format("%s incidentId=%s alertId=%s ruleId=%s severity=%s hostname=%s action=%s result=%s%n",Instant.now(),safe(i.incidentId()),safe(a.alertId()),safe(a.ruleId()),safe(a.severity()),safe(a.hostname()),safe(action),safe(result)); try { if(Files.exists(file)&&Files.size(file)+line.getBytes(StandardCharsets.UTF_8).length>MAX_BYTES) Files.move(file,file.resolveSibling(file.getFileName()+"."+Instant.now().toString().replace(':','-')),StandardCopyOption.REPLACE_EXISTING); Files.writeString(file,line,StandardCharsets.UTF_8,StandardOpenOption.CREATE,StandardOpenOption.APPEND); return true; } catch(IOException ignored) { return false; } }
+ private static String safe(Object value){return String.valueOf(value).replace('\n',' ').replace('\r',' ');}
+}

@@ -1,0 +1,21 @@
+rules:
+  - id: SSH-BRUTE-FORCE
+    enabled: true
+    threshold: 5
+    windowSeconds: 60
+    severity: HIGH
+  - id: DISTRIBUTED-BRUTE-FORCE
+    enabled: true
+    threshold: 10
+    windowSeconds: 300
+    severity: CRITICAL
+  - id: TRAFFIC-SPIKE
+    enabled: true
+    threshold: 100
+    windowSeconds: 30
+    severity: MEDIUM
+  - id: SUSPICIOUS-LOGIN
+    enabled: true
+    threshold: 3
+    windowSeconds: 300
+    severity: HIGH

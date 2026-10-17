@@ -1,0 +1,5 @@
+package com.enterprise.siem.database;
+import com.enterprise.siem.model.SecurityEvent; import java.sql.*; import java.time.Instant;
+public final class EventRepository { private final DatabaseManager db; public EventRepository(DatabaseManager db) { this.db = db; }
+ public void save(SecurityEvent e, String rawJson) throws SQLException { synchronized(db.writeLock()){String q="INSERT OR IGNORE INTO events(event_id,timestamp,hostname,agent_id,log_level,source,message,source_ip,destination_ip,username,event_type,raw_json,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"; try (PreparedStatement p=db.connection().prepareStatement(q)) { p.setString(1,e.eventId().toString()); p.setString(2,e.timestamp().toString()); p.setString(3,e.hostname()); p.setString(4,e.agentId()); p.setString(5,e.logLevel()); p.setString(6,e.source()); p.setString(7,e.message()); p.setString(8,e.sourceIp()); p.setString(9,e.destinationIp()); p.setString(10,e.username()); p.setString(11,e.eventType().name()); p.setString(12,rawJson); p.setString(13,Instant.now().toString()); p.executeUpdate(); } } }
+}

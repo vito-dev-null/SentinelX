@@ -1,0 +1,5 @@
+package com.enterprise.siem.database;
+import com.enterprise.siem.model.Alert; import java.sql.*;
+public final class AlertRepository { private final DatabaseManager db; public AlertRepository(DatabaseManager db) { this.db=db; }
+ public boolean save(Alert a) throws SQLException { synchronized(db.writeLock()){try (PreparedStatement p=db.connection().prepareStatement("INSERT INTO alerts(alert_id,rule_id,timestamp,severity,hostname,source_ip,description,status,first_seen,last_seen,occurrences) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(alert_id) DO UPDATE SET timestamp=excluded.timestamp,last_seen=excluded.last_seen,occurrences=excluded.occurrences")) { p.setString(1,a.alertId().toString());p.setString(2,a.ruleId());p.setString(3,a.timestamp().toString());p.setString(4,a.severity().name());p.setString(5,a.hostname());p.setString(6,a.sourceIp());p.setString(7,a.description());p.setString(8,a.status());p.setString(9,a.firstSeen().toString());p.setString(10,a.lastSeen().toString());p.setLong(11,a.occurrences()); return p.executeUpdate()>0; } } }
+}

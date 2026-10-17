@@ -1,0 +1,3 @@
+package com.enterprise.siem;
+import com.enterprise.siem.database.*; import com.enterprise.siem.model.*; import org.junit.jupiter.api.Test; import java.nio.file.*; import static org.junit.jupiter.api.Assertions.*;
+class DatabaseTest {@Test void persistsEvent(){try{Path p=Files.createTempFile("siem",".db");try(DatabaseManager db=new DatabaseManager(p.toString())){var e=SecurityEvent.of("n","a","s","message",EventType.SYSTEM_EVENT,null,null);new EventRepository(db).save(e,"{}");try(var q=db.connection().createStatement();var r=q.executeQuery("select count(*) from events")){assertTrue(r.next());assertEquals(1,r.getInt(1));}}Files.deleteIfExists(p);}catch(Exception e){fail(e);}}}

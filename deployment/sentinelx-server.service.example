@@ -1,0 +1,25 @@
+[Unit]
+Description=SentinelX persistent packet collector and SOC API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@INSTALL_DIR@
+Environment=JAVA_HOME=/usr/lib/jvm/java-25-openjdk
+Environment=SystemRoot=/
+EnvironmentFile=-/etc/sentinelx/server.env
+ExecStart=@INSTALL_DIR@/scripts/start-server.sh
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=false
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_PACKET
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=@INSTALL_DIR@/data @INSTALL_DIR@/logs
+
+[Install]
+WantedBy=multi-user.target

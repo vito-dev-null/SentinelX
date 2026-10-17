@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+set -eu
+APP_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$APP_DIR"
+CONFIG=${1:-$APP_DIR/config/server.properties}
+JAR="$APP_DIR/target/enterprise-siem-1.0.0-shaded.jar"
+DEFAULT_JAVA="$HOME/.jdk/sentinelx-jdk25/jdk-25.0.2/bin/java"
+JAVA_BIN=${JAVA_BIN:-$([ -x "$DEFAULT_JAVA" ] && printf '%s' "$DEFAULT_JAVA" || command -v java || true)}
+if [ -z "$JAVA_BIN" ] || [ ! -x "$JAVA_BIN" ]; then
+	printf '%s\n' 'Java non trovato' >&2
+	exit 1
+fi
+export SystemRoot=${SystemRoot:-/}
+. "$APP_DIR/scripts/cluster-autodetect.sh"
+CONFIGURED_SOC_URL=$(awk -F= '$1 == "soc.remoteUrl" {print $2; exit}' "$CONFIG" 2>/dev/null || true)
+SOC_URL=${SENTINELX_SOC_URL:-${CONFIGURED_SOC_URL:-http://127.0.0.1:8080}}
+health() {
+	/usr/bin/curl --fail --silent --max-time 2 "$1/health" >/dev/null 2>&1
+}
+mode=$(cluster_mode)
+case "$mode" in
+	REMOTE\ *)
+		export SENTINELX_SOC_URL="${mode#REMOTE }"
+		case "$SENTINELX_SOC_URL" in http://127.0.0.1:*|http://localhost:*) ;; *) stop_local_backend ;; esac
+		;;
+	STANDALONE)
+		if health "http://127.0.0.1:8080"; then
+			export SENTINELX_SOC_URL="http://127.0.0.1:8080"
+		else
+			SENTINELX_SOC_URL="$SOC_URL" "$APP_DIR/scripts/launch-desktop.sh" "$CONFIG"
+			export SENTINELX_SOC_URL="http://127.0.0.1:8080"
+		fi
+		;;
+esac
+exec "$JAVA_BIN" -Dprism.order=sw --enable-native-access=ALL-UNNAMED -jar "$JAR" desktop --config "$CONFIG"
