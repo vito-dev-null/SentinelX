@@ -1,5 +1,6 @@
 # Template config for distribution. Copy to config/server.properties and configure it for this host.
 server.port=5050
+server.host=127.0.0.1
 node.role=CONTROLLER
 node.id=nodo1
 desktop.appName=SentinelX Node 1 — Security Operations Center

@@ -74,12 +74,14 @@ public final class SIEMApplication {
 					config.bool("network.enabled", true), config.get("network.interface", "auto"),
 					config.get("network.captureMode", "INTERFACE"), config.integer("network.flowTimeoutSeconds", 60),
 					config.integer("network.retentionDays", 30), config.integer("network.metricsIntervalSeconds", 1));
-			try (flowCollector;
-					var server = new EnterpriseSIEMServer(config.integer("server.port", 5050), new EventRepository(db),
-							rules, metrics, config.integer("server.maxConnections", 100),
-							config.integer("server.maxEventsPerSecond", 5000),
-							config.integer("server.maxEventSizeBytes", 65536), tls(config),
-							config.integer("server.queueCapacity", 10000));
+				var serverBindAddress = java.net.InetAddress.getByName(config.get("server.host", "127.0.0.1"));
+				var serverTls = tls(config);
+				try (flowCollector;
+						var server = new EnterpriseSIEMServer(config.integer("server.port", 5050), new EventRepository(db),
+								rules, metrics, config.integer("server.maxConnections", 100),
+								config.integer("server.maxEventsPerSecond", 5000),
+								config.integer("server.maxEventSizeBytes", 65536), serverTls,
+								config.integer("server.queueCapacity", 10000), serverBindAddress);
 					var soc = config.bool("soc.enabled", true)
 							? new com.enterprise.siem.soc.SocApiServer(config.get("soc.host", "127.0.0.1"),
 									config.integer("soc.port", 8080), db, metrics, configuredRules,

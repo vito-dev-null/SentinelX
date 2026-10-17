@@ -32,4 +32,4 @@ for agent in nodo1 nodo2; do
 done
 ```
 
-Copy only the required public/configuration material and PKCS12 files to the deployment host using an approved secret-management process. Set `SENTINELX_TLS_KEYSTORE_PASSWORD` and `SENTINELX_TLS_TRUSTSTORE_PASSWORD` in the service environment. Enable `tls.enabled=true` on all three nodes and `tls.requireClientAuth=true` on Node 3. A client without a certificate signed by the CA is rejected during the TLS handshake.
+Copy only the required public/configuration material and PKCS12 files to the deployment host using an approved secret-management process. Set `SENTINELX_TLS_KEYSTORE_PASSWORD` and `SENTINELX_TLS_TRUSTSTORE_PASSWORD` in the service environment. Enable `tls.enabled=true` on each ingestion server and agent, and `tls.requireClientAuth=true` on each ingestion server. A client without a certificate signed by the CA is rejected during the TLS handshake. Ingestion binds to loopback by default; set `server.host` to the intended Tailscale interface address for remote agents. The server refuses a non-loopback bind unless TLS and client authentication are both enabled.

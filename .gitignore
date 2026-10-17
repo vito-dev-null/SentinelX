@@ -11,3 +11,13 @@ data/
 .sentinellogs/
 logs/
 .env
+.env.*
+!.env.example
+config/certs/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
